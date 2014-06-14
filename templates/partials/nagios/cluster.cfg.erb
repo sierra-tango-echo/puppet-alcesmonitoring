@@ -1,0 +1,175 @@
+
+
+define host{
+        use                     compute
+        host_name               node01
+        alias                   node01.prv.test1.cluster
+        address                 node01
+        }
+
+define host{
+        use                     compute
+        host_name               node02
+        alias                   node02.prv.test1.cluster
+        address                 node02
+        }
+
+define host{
+        use                     master
+        host_name               headnode1
+        alias                   headnode1.prv.test1.cluster
+        address                 headnode1
+        }
+
+#ADD HOSTS TO HOSTGROUP , SEPARATED
+define hostgroup{
+        hostgroup_name  masters
+        alias           masters
+        members         headnode1
+        }
+
+define hostgroup{
+	hostgroup_name	compute
+	alias		Compute Nodes
+	members		node01,node02
+	}
+
+define hostgroup{
+        hostgroup_name  storage
+        alias           Storage Nodes
+        #members         
+        }
+
+define hostgroup{
+	hostgroup_name	login
+	alias		login
+	#members	        
+	}
+
+define service{
+        use                             local-service
+        hostgroup_name                  masters,compute
+        service_description             PING
+	check_command			check_ping!100.0,20%!500.0,60%
+        }
+
+define service{
+	use 			nrpe-service
+	hostgroup_name 		masters
+	service_description 	load
+	check_command 		check_nrpe!check_load
+}
+
+define service{
+	use 			nrpe-service
+	hostgroup_name		masters
+	service_description 	users
+	check_command 		check_nrpe!check_users
+}
+
+define service{
+	use 			nrpe-service
+	hostgroup_name		masters,login
+	service_description 	root disk
+	check_command 		check_nrpe!check_disk
+}
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters,login
+        service_description     storage var partition
+        check_command           check_nrpe!check_disk_var
+}
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters,login
+        service_description     storage tmp partition
+        check_command           check_nrpe!check_disk_tmp
+}
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters
+        service_description     storage opt-alces partition
+        check_command           check_nrpe!check_disk_alces
+}
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters
+        service_description     storage opt-gridware partition
+        check_command           check_nrpe!check_disk_gridware
+}
+
+define service{
+	use 			nrpe-service
+	hostgroup_name 		masters,masters,login
+	service_description 	zombie procs
+	check_command 		check_nrpe!check_zombie_procs
+}
+
+define service{
+	use 			nrpe-service
+	hostgroup_name		masters,masters,login
+	service_description 	total procs
+	check_command 		check_nrpe!check_total_procs
+}
+
+define service{
+        use                     daily-service
+        hostgroup_name          masters,compute,login,storage
+        service_description     Check for memory ECC errors
+        check_command           check_ECC-IPMI!$HOSTNAME$
+        }
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters
+        service_description     Power supply redundancy
+        check_command           check_nrpe!check_PSUs
+}
+
+define service{
+        use                     nrpe-service
+        hostgroup_name          masters,storage,login
+        service_description     PERC H7X0 system disk status
+        check_command           check_nrpe!check_PERC_H7X0
+}
+
+define service{
+        use                     local-service
+        hostgroup_name          masters
+        service_description     Check grid-engine status
+        check_command           check_GE
+        }
+
+define service{
+        use                     daily-service
+        hostgroup_name          masters
+        service_description     Check dirvish backup status
+        check_command           check_dirvish
+        }
+
+#define service{
+#        use                     local-service
+#        hostgroup_name          compute
+#        service_description     Check for high load via ganglia
+#        check_command           check_load_ganglia!$HOSTNAME$
+#        }
+
+define service{
+        use                     local-service
+        hostgroup_name          masters,compute
+        service_description     Check for air inlet temperature
+        check_command           check_inlettemp!$HOSTNAME$
+        }
+
+#define service{
+#        use                             nrpe-service
+#        name                            check_smart_attributes_sda
+#        hostgroup_name                  compute
+#        service_description             SMART data for disk SDA
+#        check_command                   check_nrpe!check_smart_attributes_sda
+#        }
+
