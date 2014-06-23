@@ -10,10 +10,6 @@ class alcesmonitoring::nagios (
   
 )
 {
-
-  $masters=$alces_stack::masters
-  $machine=$alces_stack::machine
-
   if ($nagios) or ($nrpe) {
     file {['/var/lib/alces/share/nagios','/var/lib/alces/share/nagios/plugins']:
 	ensure=>directory,
@@ -371,15 +367,13 @@ class alcesmonitoring::nagios (
              require=>Package['nagios'],
              notify=>Service['nagios']
        }
-       if $alces_stack::httpd {
-         file {'/etc/httpd/conf.d/nagios.conf':
-               mode=>0644,
-               owner=>'apache',
-               group=>'apache',
-               content=>template("alcesmonitoring/nagios/nagioshttpd.conf.erb"),
-               require=>Package['httpd'],
-               notify=>Service['httpd']
-         }
+       file {'/etc/httpd/conf.d/nagios.conf':
+             mode=>0644,
+             owner=>'apache',
+             group=>'apache',
+             content=>template("alcesmonitoring/nagios/nagioshttpd.conf.erb"),
+             require=>Package['httpd'],
+             notify=>Service['httpd']
        }
     }
   }
