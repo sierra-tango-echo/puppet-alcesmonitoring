@@ -19,7 +19,11 @@ class alcesmonitoring (
   #Cluster name:
   $clustername = hiera('alcesbase::clustername','alcescluster'),
   #Master IP (network master IP addr)
-  $master_ip = hiera('alcesbase::masterip')
+  $master_ip = hiera('alcesbase::masterip'),
+  #HA (ha enabled?)
+  $ha=$alcesbase::ha,
+  #Keep os jitter minimal
+  $jitter=$alcesbase::jitter
 )
 {
   #Configure Ganglia
@@ -30,6 +34,5 @@ class alcesmonitoring (
 
   #Configure Nagios
   class { 'alcesmonitoring::nagios':
-
   }
 }

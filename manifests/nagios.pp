@@ -5,11 +5,17 @@
 ##
 ################################################################################
 class alcesmonitoring::nagios (
-  $nrpe=true,
-  $nagios=true
-  
+  $nagios=true,
+  $jitter=$alcesmonitoring::jitter,
 )
 {
+  if $jitter {
+    $nrpe=true
+  }
+  else {
+    $nrpe=false
+  }
+    
   if ($nagios) or ($nrpe) {
     file {['/var/lib/alces/share/nagios','/var/lib/alces/share/nagios/plugins']:
 	ensure=>directory,
